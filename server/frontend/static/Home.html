@@ -7,22 +7,53 @@
 <script>
 
 const logout = async (e) => {
-//Include the code for logout here.
+  e?.preventDefault();  // Optional if called from an event
+
+  try {
+    const logout_url = window.location.origin + "/djangoapp/logout";
+
+    // Just navigate to logout, let Django handle redirect
+    const res = await fetch(logout_url, { method: "GET" });
+
+    if (res.redirected || res.ok) {
+      const username = sessionStorage.getItem("username");
+      sessionStorage.removeItem("username");
+
+      alert("Logging out " + username + "...");
+      console.log("Logging out " + username + "...");
+      window.location.href = res.url || window.location.origin; // Follow the server's redirect
+    } else {
+      alert("Logout failed with status " + res.status);
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+    alert("An error occurred during logout.");
+  }
 };
 
-let checkSession = ()=>{
-  let curr_user = sessionStorage.getItem("username");
 
-  if (curr_user && curr_user !== "") {
-    document.getElementById("loginlogout").innerHTML = 
-    '<span class="homepage_links">' + curr_user +'</span>' +
-    '<a class="homepage_links" onclick="logout()" href="/">Logout</a>'
-  } else {
-    document.getElementById("loginlogout").innerHTML = 
-    '<a class="homepage_links" href="/login">Login</a>'+
-    '<a class="homepage_links"  href="/register">Register</a>'
+function checkSession() {
+  const currUser = sessionStorage.getItem("username");
+  const loginLogoutContainer = document.getElementById("loginlogout");
+
+  if (!loginLogoutContainer) {
+    console.warn("No #loginlogout element found in DOM.");
+    return;
   }
- }
+
+  if (currUser && currUser.trim() !== "") {
+    loginLogoutContainer.innerHTML = `
+      <span class="homepage_links">${currUser}</span>
+      <a class="homepage_links" href="#" onclick="logout(event)">Logout</a>
+    `;
+  } else {
+    loginLogoutContainer.innerHTML = `
+      <a class="homepage_links" href="/login">Login</a>
+      <a class="homepage_links" href="/register">Register</a>
+    `;
+  }
+}
+
 </script>
 </head>
 <body onload="checkSession()">
