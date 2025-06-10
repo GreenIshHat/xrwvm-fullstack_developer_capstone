@@ -80,7 +80,8 @@ def registration(request):
         login(request, user)
         return JsonResponse({"userName": username, "status": "Authenticated"})
     else:
-        return JsonResponse({"userName": username, "error": "Already Registered"})
+        return JsonResponse(
+            {"userName": username, "error": "Already Registered"})
 
 
 def get_dealerships(request, state="All"):
@@ -100,8 +101,10 @@ def get_dealer_reviews(request, dealer_id):
 
         for review_detail in reviews:
             try:
-                sentiment_result = analyze_review_sentiments(review_detail['review'])
-                review_detail['sentiment'] = sentiment_result.get('sentiment', 'neutral')
+                sentiment_result = analyze_review_sentiments(
+                    review_detail['review'])
+                review_detail['sentiment'] = sentiment_result.get(
+                    'sentiment', 'neutral')
             except Exception as e:
                 logger.error(f"Sentiment analysis failed: {e}")
                 review_detail['sentiment'] = 'unknown'
@@ -127,5 +130,6 @@ def add_review(request):
             return JsonResponse({"status": 200})
         except Exception as e:
             logger.error(f"Failed to post review: {e}")
-            return JsonResponse({"status": 401, "message": "Error in posting review"})
+            return JsonResponse(
+                {"status": 401, "message": "Error in posting review"})
     return JsonResponse({"status": 403, "message": "Unauthorized"})
